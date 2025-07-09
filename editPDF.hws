@@ -27,16 +27,31 @@
 @REQUIRE "polybios"
 
 
+ @MENU 1, {
+            {"File", {
+                {"New", ID = "new"},
+                {"Open...", ID = "open", Hotkey = "O"},
+                {""},
+                {"Close", ID = "close", Flags = #MENUITEM_DISABLED},
+                {""},
+                {"Save", Flags = #MENUITEM_DISABLED, Hotkey = "S"},
+                {"Quit", ID = "quit", Hotkey = "Q"}}},
+        
+            {"Edit", {
+                {"Cut", ID = "cut"},
+                {"Copy", ID = "copy"},
+                {"Paste", ID = "paste"}}},
+        
+            {"?", {
+                {"About...", ID = "about"}}}
+            }
+
 /*
 ** Give me a 1024x860 screen
 */
-@DISPLAY {Width = 1024, Height = 860, Color = #GRAY, Mode = "Windowed" , Sizeable = True, Title = "PDF editor"}
+@DISPLAY {Width = 1024, Height = 860, Color = #GRAY, Mode = "Windowed" , Sizeable = True, Title = "PDF editor", Menu = 1}
 
 
-/*
-** Load the logo graphics
-*/
-;@BRUSH 1, "logo.png", {LoadAlpha = True}
 
 
 /*
@@ -49,13 +64,13 @@ Function p_ShowPage(idx)
 	?RemoveLayer("page")
 	
 	; get PDF page as a vector brush from Polybios
-	pdf.GetBrush(1, idx, 2, loadalpha)
+	pdf.GetBrush(1, idx, 1, loadalpha)
 	
 	Local w = GetAttribute(#DISPLAY, 1, #ATTRWIDTH)
 	Local h = GetAttribute(#DISPLAY, 1, #ATTRHEIGHT)
 	
 	; and draw it!
-	DisplayBrush(2, #CENTER, #CENTER, {Width = w, Height = h, Name = "page", AnchorX = 0.5, AnchorY = 0.5 , Rotate = r, InsertPos = 1}) ;ScaleX = s, ScaleY = s, InsertPos = 1})
+	DisplayBrush(1, #CENTER, #CENTER, {Width = w, Height = h, Name = "page", AnchorX = 0.5, AnchorY = 0.5 , Rotate = r, InsertPos = 1}) ;ScaleX = s, ScaleY = s, InsertPos = 1})
 	
 	; update status bar
 	SetLayerStyle("status", {X = #RIGHT, Y=#BOTTOM , Text = "page " .. idx .. "/" .. pages})
@@ -147,8 +162,10 @@ Function p_EventFunc(msg)
 	Switch msg.action
 	Case "OnKeyDown":
 		Switch msg.key
-		Case "F5":
+		Case "F1":
 			if p_LoadPDF() > 0 Then Break; 
+		Case "F2":
+			;Save			
 			
 		Case "PAGEDOWN":
 			If docloaded And curpage < pages
@@ -215,7 +232,7 @@ SetFontColor(#BLACK)
 TextOut(#CENTER, #CENTER, "- Written by Andreas Falkenhahn -\n\n" ..
 	"This is a demonstration of the Polybios plugin\n\n" ..
 	"Controls:\n\n" ..
-	"F5 - load new document\n" ..
+	"F1 - load new document\n" ..
 	"Page up/down - browse through pages\n" ..
 	"Cursor up/down - scale page\n" ..
 	"Cursor left/right - rotate page\n" ..
