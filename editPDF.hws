@@ -28,7 +28,7 @@
 
 
 /*
-** Give me a 1024x860 screen with a nice gradient
+** Give me a 1024x860 screen
 */
 @DISPLAY {Width = 1024, Height = 860, Color = #GRAY, Mode = "Windowed" , Sizeable = True, Title = "PDF editor"}
 
@@ -51,25 +51,20 @@ Function p_ShowPage(idx)
 	; get PDF page as a vector brush from Polybios
 	pdf.GetBrush(1, idx, 2, loadalpha)
 	
+	Local w = GetAttribute(#DISPLAY, 1, #ATTRWIDTH)
+	Local h = GetAttribute(#DISPLAY, 1, #ATTRHEIGHT)
+	
 	; and draw it!
-	DisplayBrush(2, #CENTER, #CENTER, {Name = "page", AnchorX = 0.5, AnchorY = 0.5, Rotate = r, ScaleX = s, ScaleY = s, InsertPos = 1})
+	DisplayBrush(2, #CENTER, #CENTER, {Width = w, Height = h, Name = "page", AnchorX = 0.5, AnchorY = 0.5 , Rotate = r, InsertPos = 1}) ;ScaleX = s, ScaleY = s, InsertPos = 1})
 	
 	; update status bar
-	SetLayerStyle("status", {X = #RIGHT, Text = "page " .. idx .. "/" .. pages})
+	SetLayerStyle("status", {X = #RIGHT, Y=#BOTTOM , Text = "page " .. idx .. "/" .. pages})
 				
 EndFunction
 							
 
-/*
-** Main event handler
-*/	
-Function p_EventFunc(msg)
-	
-	Switch msg.action
-	Case "OnKeyDown":
-		Switch msg.key
-		Case "F5":
-			Local f$ = FileRequest("Select document", "pdf")
+Function p_LoadPDF()
+	Local f$ = FileRequest("Select document", "pdf")
 			If Not f$ Then Return
 		
 			; clean up old document
@@ -116,7 +111,7 @@ Function p_EventFunc(msg)
 			
 				Until lstate <> 0
 			
-				If lstate = 1 Then Break			
+				If lstate = 1 Then Return(1)	
 			
 			EndIf
 								
@@ -142,6 +137,18 @@ Function p_EventFunc(msg)
 			; we're ready
 			docloaded = True
 			curpage = 1
+EndFunction
+
+/*
+** Main event handler
+*/	
+Function p_EventFunc(msg)
+
+	Switch msg.action
+	Case "OnKeyDown":
+		Switch msg.key
+		Case "F5":
+			if p_LoadPDF() > 0 Then Break; 
 			
 		Case "PAGEDOWN":
 			If docloaded And curpage < pages
@@ -177,19 +184,15 @@ Function p_EventFunc(msg)
 			If docloaded
 				loadalpha = Not loadalpha
 				p_ShowPage(curpage)
-			EndIf
-		
-		/*	
-		Case "SizeWindow":
-			If docloaded
-				DebugPrint("SIZE")
-				DisplayBrush(2, #CENTER, #CENTER, {Name = "page", AnchorX = 0.5, AnchorY = 0.5, Rotate = r, ScaleX = s, ScaleY = s, InsertPos = 1})
-				; update status bar
-				SetLayerStyle("status", {X = #RIGHT, Text = "page " .. idx .. "/" .. pages})
-			EndIf	
-		*/
-					
+			EndIf			
 		EndSwitch
+	
+	Case "SizeWindow":
+		If docloaded
+			s = 1
+			p_ShowPage(curpage)
+		EndIf	
+	
 	EndSwitch					
 
 EndFunction				
