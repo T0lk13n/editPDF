@@ -60,11 +60,11 @@
 Function p_ShowPage(idx)
 
 	; we use the new 7.1 failsafe syntax here to signal that it's ok if those commands fail
-	?FreeBrush(2)
+	?FreeBrush(1)
 	?RemoveLayer("page")
 	
 	; get PDF page as a vector brush from Polybios
-	pdf.GetBrush(1, idx, 1, loadalpha)
+	pdf.GetBrush(myPDF, idx, 1, loadalpha)
 	
 	Local w = GetAttribute(#DISPLAY, 1, #ATTRWIDTH)
 	Local h = GetAttribute(#DISPLAY, 1, #ATTRHEIGHT)
@@ -74,6 +74,12 @@ Function p_ShowPage(idx)
 	
 	; update status bar
 	SetLayerStyle("status", {X = #RIGHT, Y=#BOTTOM , Text = "page " .. idx .. "/" .. pages})
+	
+	 ;Local p = myPDF:GetPageByIndex(idx)
+				
+	;page:MoveTo(100,100)
+	;myPDF:Rectangle(100,100,100,100)	
+				
 				
 EndFunction
 							
@@ -85,14 +91,14 @@ Function p_LoadPDF()
 			; clean up old document
 			If docloaded
 				FreeLayers(False)
-				FreeBrush(2)
+				FreeBrush(1)
 				pdf.CloseDocument(1)
 				docloaded = False
 			EndIf
 
 			; open new PDF
 			ExitOnError(False)
-			pdf.OpenDocument(1, f$)
+			myPDF = pdf.OpenDocument(nil, f$)
 			Local err = GetLastError()
 			ExitOnError(True)
 			
@@ -108,7 +114,7 @@ Function p_LoadPDF()
 							lstate = 1
 						Else
 							ExitOnError(False)
-							pdf.OpenDocument(1, f$, {Password = pwd$})
+							myPDF = pdf.OpenDocument(nil, f$, {Password = pwd$})
 							err = GetLastError()
 							ExitOnError(True)
 							If err = 0
@@ -132,7 +138,7 @@ Function p_LoadPDF()
 								
 			; query number of pages in PDF document
 			PDFTYPE = pdf.GetObjectType()
-			pages = GetAttribute(PDFTYPE, 1, #PDFATTRPAGES)			
+			pages = GetAttribute(PDFTYPE, myPDF, #PDFATTRPAGES)			
 
 			; reset transformation parameters
 			r = 0
@@ -207,6 +213,7 @@ Function p_EventFunc(msg)
 	Case "SizeWindow":
 		If docloaded
 			s = 1
+			SetLayerStyle("page", {ScaleX = s, ScaleY = s})
 			p_ShowPage(curpage)
 		EndIf	
 	
