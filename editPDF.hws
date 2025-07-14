@@ -1,55 +1,38 @@
-﻿/****************************************************************
-**                                                             **
-** Name:        PDFViewer                                      **
-** Author:      Andreas Falkenhahn                             **
-** Version:     1.1                                            **
-** Date:        22.06.19                                       **
-** Interpreter: Hollywood 7.1                                  **
-** Licence:     Freeware                                       **
-** Function:    Simple PDF viewer written in Hollywood         **
-**                                                             **
-** History:                                                    **
-**                                                             **
-** 1.1: (22.06.19)                                             **
-**                                                             **
-** - added support for password-protected PDFs                 **
-**                                                             **
-** 1.0: (15.04.18)                                             **
-**                                                             **
-** - initial release                                           **
-**                                                             **
-****************************************************************/
+/*
+** Information about this app 
+*/
+@APPTITLE "editPDF"
+@APPVERSION "$VER: editPDF 1.0 (14.07.2025)"
+@APPCOPYRIGHT "(C) Copyright 2025 Compofillers/goblins"
+@APPAUTHOR "70lk13n"
+@APPDESCRIPTION "simple edit PDF"
 
+;** Enable DPI-awareness so that our GUI looks sharp even on high DPI monitors
+@OPTIONS {DPIAware = True}
+
+
+;** We require the Polybios plugin
+@REQUIRE "polybios"
+;** This script requires the RapaGUI plugin
+@REQUIRE "RapaGUI"
 
 /*
-** We require the Polybios plugin
+** Use a black background for our Hollywood display
 */
-@REQUIRE "polybios"
+@DISPLAY {Color = #WHITE} 
 
 
- @MENU 1, {
-            {"File", {
-                {"New", ID = "new"},
-                {"Open...", ID = "open", Hotkey = "O"},
-                {""},
-                {"Close", ID = "close", Flags = #MENUITEM_DISABLED},
-                {""},
-                {"Save", Flags = #MENUITEM_DISABLED, Hotkey = "S"},
-                {"Quit", ID = "quit", Hotkey = "Q"}}},
-        
-            {"Edit", {
-                {"Cut", ID = "cut"},
-                {"Copy", ID = "copy"},
-                {"Paste", ID = "paste"}}},
-        
-            {"?", {
-                {"About...", ID = "about"}}}
-            }
+@ICON 0,"data/open.png"
+@ICON 1,"data/save.png"
+@ICON 2,"data/cut.png"
+@ICON 3,"data/copy.png"
+@ICON 4,"data/paste.png"
+
 
 /*
 ** Give me a 1024x860 screen
 */
-@DISPLAY {Width = 1024, Height = 860, Color = #GRAY, Mode = "Windowed" , Sizeable = True, Title = "PDF editor", Menu = 1}
+;@DISPLAY {Width = 1024, Height = 860, Color = #GRAY, Mode = "Windowed" , Sizeable = True, Title = "PDF editor", Menu = 1}
 
 
 
@@ -69,6 +52,7 @@ Function p_ShowPage(idx)
 	Local w = GetAttribute(#DISPLAY, 1, #ATTRWIDTH)
 	Local h = GetAttribute(#DISPLAY, 1, #ATTRHEIGHT)
 	
+	;moai.CreateObject([[<image id="mybrush"> brush 1</image>]])
 	; and draw it!
 	DisplayBrush(1, #CENTER, #CENTER, {Width = w, Height = h, Name = "page", AnchorX = 0.5, AnchorY = 0.5 , Rotate = r, InsertPos = 1}) ;ScaleX = s, ScaleY = s, InsertPos = 1})
 	
@@ -217,6 +201,18 @@ Function p_EventFunc(msg)
 			p_ShowPage(curpage)
 		EndIf	
 	
+	Case "RapaGUI":
+		Switch msg.attribute
+		Case "CloseRequest":
+			;moai.Set("image", "brush", db + 1)
+			;db = Not db
+			End
+		Case "Pressed":
+			p_loadPDF()
+			;If(msg.id = "openIcon") Then DebugPrint("OPEN")			
+			
+		EndSwitch
+		
 	EndSwitch					
 
 EndFunction				
@@ -229,30 +225,16 @@ EnableLayers
 ; show logo
 ;DisplayBrush(1, #CENTER, #CENTER - 180, {Hidden = True})
 
-
-; give us a font
-SetFont(#SANS, 36)
-SetFontStyle(#ANTIALIAS)
-SetFontColor(#BLACK)
-
-; show help text
-TextOut(#CENTER, #CENTER, "- Written by Andreas Falkenhahn -\n\n" ..
-	"This is a demonstration of the Polybios plugin\n\n" ..
-	"Controls:\n\n" ..
-	"F1 - load new document\n" ..
-	"Page up/down - browse through pages\n" ..
-	"Cursor up/down - scale page\n" ..
-	"Cursor left/right - rotate page\n" ..
-	"a - toggle transparency flag") ;, {Align = #CENTER, Hidden = True})
-
-
 ; scroll in logo and help text
 ;ShowLayerFX(1, #SCROLLTOP)
 ;ShowLayerFX(2, #SCROLLBOTTOM)
 
+
+moai.CreateApp((FileToString("editPDF.xml")))
+
 ; set up event handlers
 InstallEventHandler({OnKeyDown = p_EventFunc,
-		    SizeWindow = p_EventFunc})
+			RapaGUI = p_EventFunc})
 
 ; and go!
 Repeat

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<application id="app" useicons = "true">
+
+	<window id="win" title="editPDF"  width="800" height="600" notify="closerequest">
+		<vgroup>
+					<toolbar id="toolbar" ViewMode="TextGfx">
+						<button icon="0" id="openIcon" help="Open PDF"/>
+						<button icon="1"/>
+						<button/>
+						<button icon="2"/>
+						<button icon="3"/>
+						<button icon="4"/>
+        			</toolbar>
+
+					<vgroup id="pdfIMG" frame="true">
+						<rectangle/>
+						<hollywood display="1" fixwidth="false" fixheight="false"/> 
+						<rectangle/>
+					</vgroup>
+
+		</vgroup>
+	</window>
+</application>
+
