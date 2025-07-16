@@ -18,6 +18,8 @@
 						<rectangle/>
 					</vgroup>
 
+					<text id="paginas">Pagina: </text> 
+
 		</vgroup>
 	</window>
 </application>

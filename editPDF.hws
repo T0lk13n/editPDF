@@ -40,17 +40,13 @@ Function p_ShowPage(idx)
 	; get PDF page as a vector brush from Polybios
 	pdf.GetBrush(myPDF, idx, 1, loadalpha)
 	
-	;Local w = GetAttribute(#DISPLAY, 1, #ATTRWIDTH)
-	;Local h = GetAttribute(#DISPLAY, 1, #ATTRHEIGHT)
-	
 	; and draw it!
 	DisplayBrush(1, #CENTER, #CENTER, {Width = w, Height = h, Name = "page", AnchorX = 0.5, AnchorY = 0.5 , Rotate = r, InsertPos = 1, ScaleX = s, ScaleY = s, InsertPos = 1})
 	
-	
-	;METER ESTA INFORMACIN EN EL GUI
 	; update status bar
-	SetLayerStyle("status", {X = #RIGHT, Y=#BOTTOM , Text = "page " .. idx .. "/" .. pages})
-				
+	a$ = "Pagina: ".. idx .."/".. pages
+	moai.Set("paginas", "TEXT", a$)
+			
 EndFunction
 							
 
@@ -113,17 +109,9 @@ Function p_LoadPDF()
 			; reset transformation parameters
 			r = 0
 			s = 1
-			loadalpha = False
 			
-			; set up status bar		
-			If Not docloaded
-				FreeLayers(False)
-				TextOut(#RIGHT, #BOTTOM, "page 1/" .. pages, {Name = "status"})
-			EndIf				
-				
 			; show page and move status bar to the front	
 			p_ShowPage(1)
-			LayerToFront("status")
 			
 			; we're ready
 			docloaded = True
