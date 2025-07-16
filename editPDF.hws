@@ -17,24 +17,15 @@
 @REQUIRE "RapaGUI"
 
 /*
-** Use a black background for our Hollywood display
+** Use a  background for our Hollywood display
 */
-@DISPLAY {Color = #WHITE} 
-
+@DISPLAY 1,{Color = #WHITE, ScaleMode = #SCALEMODE_AUTO} 
 
 @ICON 0,"data/open.png"
 @ICON 1,"data/save.png"
 @ICON 2,"data/cut.png"
 @ICON 3,"data/copy.png"
 @ICON 4,"data/paste.png"
-
-
-/*
-** Give me a 1024x860 screen
-*/
-;@DISPLAY {Width = 1024, Height = 860, Color = #GRAY, Mode = "Windowed" , Sizeable = True, Title = "PDF editor", Menu = 1}
-
-
 
 
 /*
@@ -49,21 +40,16 @@ Function p_ShowPage(idx)
 	; get PDF page as a vector brush from Polybios
 	pdf.GetBrush(myPDF, idx, 1, loadalpha)
 	
-	Local w = GetAttribute(#DISPLAY, 1, #ATTRWIDTH)
-	Local h = GetAttribute(#DISPLAY, 1, #ATTRHEIGHT)
+	;Local w = GetAttribute(#DISPLAY, 1, #ATTRWIDTH)
+	;Local h = GetAttribute(#DISPLAY, 1, #ATTRHEIGHT)
 	
-	;moai.CreateObject([[<image id="mybrush"> brush 1</image>]])
 	; and draw it!
-	DisplayBrush(1, #CENTER, #CENTER, {Width = w, Height = h, Name = "page", AnchorX = 0.5, AnchorY = 0.5 , Rotate = r, InsertPos = 1}) ;ScaleX = s, ScaleY = s, InsertPos = 1})
+	DisplayBrush(1, #CENTER, #CENTER, {Width = w, Height = h, Name = "page", AnchorX = 0.5, AnchorY = 0.5 , Rotate = r, InsertPos = 1, ScaleX = s, ScaleY = s, InsertPos = 1})
 	
+	
+	;METER ESTA INFORMACIN EN EL GUI
 	; update status bar
 	SetLayerStyle("status", {X = #RIGHT, Y=#BOTTOM , Text = "page " .. idx .. "/" .. pages})
-	
-	 ;Local p = myPDF:GetPageByIndex(idx)
-				
-	;page:MoveTo(100,100)
-	;myPDF:Rectangle(100,100,100,100)	
-				
 				
 EndFunction
 							
@@ -150,6 +136,7 @@ EndFunction
 Function p_EventFunc(msg)
 
 	Switch msg.action
+		
 	Case "OnKeyDown":
 		Switch msg.key
 		Case "F1":
@@ -194,22 +181,13 @@ Function p_EventFunc(msg)
 			EndIf			
 		EndSwitch
 	
-	Case "SizeWindow":
-		If docloaded
-			s = 1
-			SetLayerStyle("page", {ScaleX = s, ScaleY = s})
-			p_ShowPage(curpage)
-		EndIf	
 	
 	Case "RapaGUI":
 		Switch msg.attribute
 		Case "CloseRequest":
-			;moai.Set("image", "brush", db + 1)
-			;db = Not db
 			End
 		Case "Pressed":
-			p_loadPDF()
-			;If(msg.id = "openIcon") Then DebugPrint("OPEN")			
+			If(msg.id = "openIcon") Then 	p_loadPDF()
 			
 		EndSwitch
 		
@@ -234,7 +212,7 @@ moai.CreateApp((FileToString("editPDF.xml")))
 
 ; set up event handlers
 InstallEventHandler({OnKeyDown = p_EventFunc,
-			RapaGUI = p_EventFunc})
+			                               RapaGUI = p_EventFunc})
 
 ; and go!
 Repeat
