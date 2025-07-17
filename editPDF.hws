@@ -1,4 +1,4 @@
-/*
+﻿/*
 ** Information about this app 
 */
 @APPTITLE "editPDF"
@@ -58,13 +58,13 @@ Function p_LoadPDF()
 			If docloaded
 				FreeLayers(False)
 				FreeBrush(1)
-				pdf.CloseDocument(1)
+				pdf.CloseDocument(myPDF)
 				docloaded = False
 			EndIf
 
 			; open new PDF
 			ExitOnError(False)
-			myPDF = pdf.OpenDocument(nil, f$)
+			myPDF = pdf.OpenDocument(Nil, f$)
 			Local err = GetLastError()
 			ExitOnError(True)
 			
@@ -80,7 +80,7 @@ Function p_LoadPDF()
 							lstate = 1
 						Else
 							ExitOnError(False)
-							myPDF = pdf.OpenDocument(nil, f$, {Password = pwd$})
+							myPDF = pdf.OpenDocument(Nil, f$, {Password = pwd$})
 							err = GetLastError()
 							ExitOnError(True)
 							If err = 0
@@ -128,7 +128,7 @@ Function p_EventFunc(msg)
 	Case "OnKeyDown":
 		Switch msg.key
 		Case "F1":
-			if p_LoadPDF() > 0 Then Break; 
+			If p_LoadPDF() > 0 Then Break; 
 		Case "F2":
 			;Save			
 			
@@ -175,7 +175,7 @@ Function p_EventFunc(msg)
 		Case "CloseRequest":
 			End
 		Case "Pressed":
-			If(msg.id = "openIcon") Then 	p_loadPDF()
+			If(msg.id = "openIcon") Then 	p_LoadPDF()
 			
 		EndSwitch
 		
@@ -200,7 +200,7 @@ moai.CreateApp((FileToString("editPDF.xml")))
 
 ; set up event handlers
 InstallEventHandler({OnKeyDown = p_EventFunc,
-			                               RapaGUI = p_EventFunc})
+						       RapaGUI = p_EventFunc})
 
 ; and go!
 Repeat
